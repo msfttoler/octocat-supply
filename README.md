@@ -4,7 +4,7 @@
 
 Welcome to the OctoCAT Supply Website - your go-to demo for showcasing the incredible capabilities of GitHub Copilot, GHAS, and the power of AI-assisted development!
 
-## [!NOTE] For the Hands on Demo, follow the step-by-step instructions in [demo/walkthroughs/general/demo-steps.md](./demo/walkthroughs/general/demo-steps.md). 
+## [!NOTE] For the Hands on Demo, follow the step-by-step instructions in [Zero-to-Agents Hands-on Lab](./demo/walkthroughs/general/demo-steps.md).
 
 > (Optional) Additional Demos can be found at [Demo Walkthroughs](./demo/walkthroughs/README.md).
 
