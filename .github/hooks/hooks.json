@@ -1,15 +1,6 @@
 {
   "version": 1,
   "hooks": {
-    "PostToolUse": [
-      {
-        "type": "command",
-        "bash": ".github/hooks/log-tool-usage.sh",
-        "powershell": "Write-Host 'log-tool-usage not implemented for PowerShell'",
-        "cwd": ".",
-        "timeoutSec": 10
-      }
-    ],
     "SessionStart": [
       {
         "type": "command",
