@@ -1,12 +1,6 @@
 name: Create Cart Implementation Issue
 
 on:
-  pull_request:
-    branches:
-      - main
-    types:
-      - opened
-      - synchronize
   workflow_dispatch:
 
 permissions: {}
@@ -20,18 +14,17 @@ jobs:
       - name: Create Shopping Cart Implementation Issue
         uses: actions/github-script@v8
         with:
+          github-token: ${{ secrets.AUTO_REMEDIATION_PAT || secrets.GITHUB_TOKEN }}
           script: |
             const title = 'feat: Simple Shopping Cart Implementation';
 
-            // Check if issue already exists to avoid duplicates
-            const existing = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              per_page: 50
+            // Check if issue already exists to avoid duplicates (uses search for reliability)
+            const search = await github.rest.search.issuesAndPullRequests({
+              q: `repo:${context.repo.owner}/${context.repo.repo} is:issue "${title}"`,
+              per_page: 5
             });
 
-            const duplicate = existing.data.find(i => i.title === title);
+            const duplicate = search.data.items.find(i => i.title === title);
             if (duplicate) {
               core.info(`Issue already exists: #${duplicate.number} – ${duplicate.html_url}`);
               return;
