@@ -1,0 +1,86 @@
+name: Create Cart Implementation Issue
+
+on:
+  push:
+    branches:
+      - copilot/track-implementation-work
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  create-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Shopping Cart Implementation Issue
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const title = 'feat: Simple Shopping Cart Implementation';
+
+            // Check if issue already exists to avoid duplicates
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 50
+            });
+
+            const duplicate = existing.data.find(i => i.title === title);
+            if (duplicate) {
+              core.info(`Issue already exists: #${duplicate.number} – ${duplicate.html_url}`);
+              return;
+            }
+
+            const body = `## Shopping Cart Feature — Implementation Checklist
+
+Track the implementation of a simple cart experience for the OctoCAT Supply frontend, based on the cart design (\`docs/design/cart.png\`). No discount options. Minimal implementation phases.
+
+---
+
+### Phase 1 — Cart State Management
+- [ ] Create \`CartContext.tsx\` with cart state: items list, add, remove, and update-quantity actions
+- [ ] Expose a \`useCart\` hook from \`CartContext\`
+- [ ] Wrap the app with \`CartProvider\` in \`App.tsx\`
+
+### Phase 2 — Navigation Cart Icon
+- [ ] Add a cart SVG icon to \`Navigation.tsx\`
+- [ ] Show an item-count badge on the icon when the cart is non-empty
+- [ ] Link the icon to the \`/cart\` route
+
+### Phase 3 — Cart Page (\`/cart\`)
+- [ ] Create \`frontend/src/components/Cart.tsx\` page component
+- [ ] Display cart items in a table: Product Image, Product Name, Unit Price, Quantity, Total, Remove
+- [ ] Allow quantity editing per row
+- [ ] Provide a remove button per row
+- [ ] Show an order summary sidebar: Subtotal, flat shipping cost, Grand Total
+- [ ] Add a "Proceed to Checkout" placeholder button
+- [ ] Show an empty-cart state with a link back to \`/products\`
+
+### Phase 4 — Products Page Integration
+- [ ] Connect the "Add to Cart" button on product cards to \`addToCart()\` from \`CartContext\`
+- [ ] Pass product image name (\`imgName\`) into the cart item
+
+### Phase 5 — Routing
+- [ ] Register \`/cart\` route in \`App.tsx\`
+
+---
+
+### Acceptance Criteria
+- [ ] Cart icon appears in the navbar and shows item count when products are added
+- [ ] Products can be added to the cart from the Products page
+- [ ] Cart page shows all added items with correct totals
+- [ ] Items can be removed from the cart
+- [ ] Empty cart state renders correctly
+- [ ] No discount/coupon functionality included in this phase`;
+
+            const result = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['enhancement']
+            });
+
+            core.info(`Created issue #${result.data.number}: ${result.data.html_url}`);
