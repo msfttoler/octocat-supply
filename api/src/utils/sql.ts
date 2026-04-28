@@ -176,7 +176,7 @@ export function buildInsertSQL<T extends Record<string, unknown>>(
 ): { sql: string; values: unknown[] } {
   const snakeCaseData = objectToSnakeCase(data);
   const columns = Object.keys(snakeCaseData);
-  const values = Object.values(snakeCaseData);
+  const values = Object.values(snakeCaseData).map((v) => (typeof v === 'boolean' ? (v ? 1 : 0) : v));
   const placeholders = generatePlaceholders(columns.length);
 
   const sql = `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders})`;
@@ -194,7 +194,7 @@ export function buildUpdateSQL<T extends Record<string, unknown>>(
 ): { sql: string; values: unknown[] } {
   const snakeCaseData = objectToSnakeCase(data as Record<string, unknown>);
   const columns = Object.keys(snakeCaseData);
-  const values = Object.values(snakeCaseData);
+  const values = Object.values(snakeCaseData).map((v) => (typeof v === 'boolean' ? (v ? 1 : 0) : v));
 
   const setClause = columns.map((col) => `${col} = ?`).join(', ');
   const sql = `UPDATE ${table} SET ${setClause} WHERE ${whereClause}`;
