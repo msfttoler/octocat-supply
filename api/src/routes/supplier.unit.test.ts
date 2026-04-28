@@ -189,7 +189,7 @@ describe('Supplier Route unit tests', () => {
       expect(response.body.status).toBe('APPROVED');
     });
 
-    it('should return APPROVED for an inactive supplier due to misleading indentation in processSupplierStatus', async () => {
+    it('should return APPROVED for inactive supplier (documents current bug)', async () => {
       // NOTE: Due to misleading indentation in processSupplierStatus, `return 'APPROVED'`
       // runs unconditionally regardless of supplier.active. The INACTIVE/PENDING branches
       // are dead code. This test documents the current (buggy) behavior.
@@ -202,7 +202,7 @@ describe('Supplier Route unit tests', () => {
       expect(response.body.status).toBe('APPROVED');
     });
 
-    it('should return APPROVED for an inactive but verified supplier (processSupplierStatus bug)', async () => {
+    it('should return APPROVED for inactive verified supplier (documents bug)', async () => {
       // The `return 'APPROVED'` is not inside the `if (supplier.active)` block,
       // so it always executes before reaching the `return 'PENDING'` branch.
       mockRepo.findById.mockResolvedValue({ supplierId: 3, name: 'Inactive Verified', active: false, verified: true });

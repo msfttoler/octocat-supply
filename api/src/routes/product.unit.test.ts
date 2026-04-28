@@ -145,8 +145,10 @@ describe('Product Route unit tests', () => {
       expect(response.body).toEqual([]);
     });
 
-    it('should return 404 when repo returns a falsy value', async () => {
-      // Exercises the else branch: `if (product) { ... } else { 404 }`
+    it('should return 404 when repo returns a falsy value (defensive: findByName never returns null in production)', async () => {
+      // This exercises the else branch of `if (product) { ... } else { 404 }`.
+      // In production, findByName always returns an array (never null/undefined),
+      // so this branch is currently dead code. The test documents the defensive behavior.
       mockRepo.findByName.mockResolvedValue(null);
 
       const response = await request(app).get('/products/name/NoMatch');
