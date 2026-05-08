@@ -58,7 +58,7 @@ function StarRating({
       >
         Review
       </span>
-      <div className="flex items-center gap-2" role="group" aria-label={`Rate ${productName}`}>
+      <div className="flex items-center gap-2" role="radiogroup" aria-label={`Rate ${productName}`}>
         {[1, 2, 3, 4, 5].map((star) => {
           const isSelected = star <= rating;
           return (
@@ -66,7 +66,8 @@ function StarRating({
               key={star}
               type="button"
               onClick={() => onRatingChange(productId, star)}
-              aria-pressed={isSelected}
+              role="radio"
+              aria-checked={isSelected}
               aria-label={`Rate ${productName} ${star} star${star > 1 ? 's' : ''}`}
               className={getStarButtonClasses(isSelected, darkMode, size)}
             >
