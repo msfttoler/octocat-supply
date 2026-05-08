@@ -23,6 +23,7 @@ const fetchProducts = async (): Promise<Product[]> => {
 
 export default function Products() {
   const [quantities, setQuantities] = useState<Record<number, number>>({});
+  const [ratings, setRatings] = useState<Record<number, number>>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -64,6 +65,13 @@ export default function Products() {
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
     setShowModal(true);
+  };
+
+  const handleRatingChange = (productId: number, rating: number) => {
+    setRatings((prev) => ({
+      ...prev,
+      [productId]: rating,
+    }));
   };
 
   if (isLoading) {
@@ -207,6 +215,35 @@ export default function Products() {
                       )}
                     </div>
 
+                    <div className="space-y-2">
+                      <span
+                        className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors duration-300`}
+                      >
+                        Review
+                      </span>
+                      <div className="flex items-center gap-2" role="radiogroup" aria-label={`Rate ${product.name}`}>
+                        {[1, 2, 3, 4, 5].map((rating) => {
+                          const isSelected = rating <= (ratings[product.productId] || 0);
+                          return (
+                            <button
+                              key={rating}
+                              type="button"
+                              onClick={() => handleRatingChange(product.productId, rating)}
+                              role="radio"
+                              aria-checked={isSelected}
+                              aria-label={`Rate ${product.name} ${rating} star${rating > 1 ? 's' : ''}`}
+                              className={`w-10 h-10 rounded-md flex items-center justify-center text-2xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${isSelected
+                                ? 'text-red-600 border-red-500 bg-red-100'
+                                : `${darkMode ? 'text-gray-400 border-gray-600 bg-gray-700 hover:text-red-400 hover:border-red-400' : 'text-gray-400 border-gray-300 bg-white hover:text-red-500 hover:border-red-400'}`
+                                } ${darkMode ? 'focus:ring-red-400 focus:ring-offset-gray-800' : 'focus:ring-red-500 focus:ring-offset-white'}`}
+                            >
+                              <span aria-hidden="true">★</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
                     <div className="flex items-center justify-between">
                       <div
                         className={`flex items-center space-x-3 ${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded-lg p-1 transition-colors duration-300`}
@@ -301,6 +338,34 @@ export default function Products() {
             >
               {selectedProduct.description}
             </p>
+            <div className="mt-6 space-y-2">
+              <span
+                className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors duration-300`}
+              >
+                Review
+              </span>
+              <div className="flex items-center gap-2" role="radiogroup" aria-label={`Rate ${selectedProduct.name}`}>
+                {[1, 2, 3, 4, 5].map((rating) => {
+                  const isSelected = rating <= (ratings[selectedProduct.productId] || 0);
+                  return (
+                    <button
+                      key={rating}
+                      type="button"
+                      onClick={() => handleRatingChange(selectedProduct.productId, rating)}
+                      role="radio"
+                      aria-checked={isSelected}
+                      aria-label={`Rate ${selectedProduct.name} ${rating} star${rating > 1 ? 's' : ''}`}
+                      className={`w-11 h-11 rounded-md flex items-center justify-center text-2xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${isSelected
+                        ? 'text-red-600 border-red-500 bg-red-100'
+                        : `${darkMode ? 'text-gray-400 border-gray-600 bg-gray-700 hover:text-red-400 hover:border-red-400' : 'text-gray-400 border-gray-300 bg-white hover:text-red-500 hover:border-red-400'}`
+                        } ${darkMode ? 'focus:ring-red-400 focus:ring-offset-gray-800' : 'focus:ring-red-500 focus:ring-offset-white'}`}
+                    >
+                      <span aria-hidden="true">★</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       )}
