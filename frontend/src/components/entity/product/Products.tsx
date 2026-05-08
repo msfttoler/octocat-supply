@@ -16,10 +16,68 @@ interface Product {
   discount?: number;
 }
 
+interface StarRatingProps {
+  productId: number;
+  productName: string;
+  rating: number;
+  darkMode: boolean;
+  size?: 'md' | 'lg';
+  onRatingChange: (productId: number, rating: number) => void;
+}
+
 const fetchProducts = async (): Promise<Product[]> => {
   const { data } = await axios.get(`${api.baseURL}${api.endpoints.products}`);
   return data;
 };
+
+function getStarButtonClasses(isSelected: boolean, darkMode: boolean, size: 'md' | 'lg') {
+  const sizeClasses = size === 'lg' ? 'w-11 h-11 text-2xl' : 'w-10 h-10 text-2xl';
+  const selectedClasses = 'text-red-600 border-red-500 bg-red-100';
+  const unselectedClasses = darkMode
+    ? 'text-gray-400 border-gray-600 bg-gray-700 hover:text-red-400 hover:border-red-400'
+    : 'text-gray-400 border-gray-300 bg-white hover:text-red-500 hover:border-red-400';
+  const focusClasses = darkMode
+    ? 'focus:ring-red-400 focus:ring-offset-gray-800'
+    : 'focus:ring-red-500 focus:ring-offset-white';
+
+  return `${sizeClasses} rounded-md flex items-center justify-center border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${isSelected ? selectedClasses : unselectedClasses} ${focusClasses}`;
+}
+
+function StarRating({
+  productId,
+  productName,
+  rating,
+  darkMode,
+  size = 'md',
+  onRatingChange,
+}: StarRatingProps) {
+  return (
+    <div className="space-y-2">
+      <span
+        className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors duration-300`}
+      >
+        Review
+      </span>
+      <div className="flex items-center gap-2" role="group" aria-label={`Rate ${productName}`}>
+        {[1, 2, 3, 4, 5].map((star) => {
+          const isSelected = star <= rating;
+          return (
+            <button
+              key={star}
+              type="button"
+              onClick={() => onRatingChange(productId, star)}
+              aria-pressed={isSelected}
+              aria-label={`Rate ${productName} ${star} star${star > 1 ? 's' : ''}`}
+              className={getStarButtonClasses(isSelected, darkMode, size)}
+            >
+              <span aria-hidden="true">★</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function Products() {
   const [quantities, setQuantities] = useState<Record<number, number>>({});
@@ -215,34 +273,13 @@ export default function Products() {
                       )}
                     </div>
 
-                    <div className="space-y-2">
-                      <span
-                        className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors duration-300`}
-                      >
-                        Review
-                      </span>
-                      <div className="flex items-center gap-2" role="radiogroup" aria-label={`Rate ${product.name}`}>
-                        {[1, 2, 3, 4, 5].map((rating) => {
-                          const isSelected = rating <= (ratings[product.productId] || 0);
-                          return (
-                            <button
-                              key={rating}
-                              type="button"
-                              onClick={() => handleRatingChange(product.productId, rating)}
-                              role="radio"
-                              aria-checked={isSelected}
-                              aria-label={`Rate ${product.name} ${rating} star${rating > 1 ? 's' : ''}`}
-                              className={`w-10 h-10 rounded-md flex items-center justify-center text-2xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${isSelected
-                                ? 'text-red-600 border-red-500 bg-red-100'
-                                : `${darkMode ? 'text-gray-400 border-gray-600 bg-gray-700 hover:text-red-400 hover:border-red-400' : 'text-gray-400 border-gray-300 bg-white hover:text-red-500 hover:border-red-400'}`
-                                } ${darkMode ? 'focus:ring-red-400 focus:ring-offset-gray-800' : 'focus:ring-red-500 focus:ring-offset-white'}`}
-                            >
-                              <span aria-hidden="true">★</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
+                    <StarRating
+                      productId={product.productId}
+                      productName={product.name}
+                      rating={ratings[product.productId] || 0}
+                      darkMode={darkMode}
+                      onRatingChange={handleRatingChange}
+                    />
 
                     <div className="flex items-center justify-between">
                       <div
@@ -338,33 +375,15 @@ export default function Products() {
             >
               {selectedProduct.description}
             </p>
-            <div className="mt-6 space-y-2">
-              <span
-                className={`block text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors duration-300`}
-              >
-                Review
-              </span>
-              <div className="flex items-center gap-2" role="radiogroup" aria-label={`Rate ${selectedProduct.name}`}>
-                {[1, 2, 3, 4, 5].map((rating) => {
-                  const isSelected = rating <= (ratings[selectedProduct.productId] || 0);
-                  return (
-                    <button
-                      key={rating}
-                      type="button"
-                      onClick={() => handleRatingChange(selectedProduct.productId, rating)}
-                      role="radio"
-                      aria-checked={isSelected}
-                      aria-label={`Rate ${selectedProduct.name} ${rating} star${rating > 1 ? 's' : ''}`}
-                      className={`w-11 h-11 rounded-md flex items-center justify-center text-2xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${isSelected
-                        ? 'text-red-600 border-red-500 bg-red-100'
-                        : `${darkMode ? 'text-gray-400 border-gray-600 bg-gray-700 hover:text-red-400 hover:border-red-400' : 'text-gray-400 border-gray-300 bg-white hover:text-red-500 hover:border-red-400'}`
-                        } ${darkMode ? 'focus:ring-red-400 focus:ring-offset-gray-800' : 'focus:ring-red-500 focus:ring-offset-white'}`}
-                    >
-                      <span aria-hidden="true">★</span>
-                    </button>
-                  );
-                })}
-              </div>
+            <div className="mt-6">
+              <StarRating
+                productId={selectedProduct.productId}
+                productName={selectedProduct.name}
+                rating={ratings[selectedProduct.productId] || 0}
+                darkMode={darkMode}
+                size="lg"
+                onRatingChange={handleRatingChange}
+              />
             </div>
           </div>
         </div>
