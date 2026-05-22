@@ -54,6 +54,7 @@ export const products: Product[] = [
     unit: 'piece',
     imgName: 'feeder.png',
     discount: 0.25,
+    stockLevel: 42,
   },
   {
     productId: 2,
@@ -66,6 +67,7 @@ export const products: Product[] = [
     unit: 'piece',
     imgName: 'litter-box.png',
     discount: 0.25,
+    stockLevel: 7,
   },
   {
     productId: 3,
@@ -77,6 +79,7 @@ export const products: Product[] = [
     sku: 'CAT-FLIX-001',
     unit: 'piece',
     imgName: 'catflix.png',
+    stockLevel: 25,
   },
   {
     productId: 4,
@@ -88,6 +91,7 @@ export const products: Product[] = [
     sku: 'CAT-COLLAR-001',
     unit: 'piece',
     imgName: 'smart-collar.png',
+    stockLevel: 5,
   },
   {
     productId: 5,
@@ -99,6 +103,7 @@ export const products: Product[] = [
     sku: 'CAT-BED-001',
     unit: 'piece',
     imgName: 'sleep-nest.png',
+    stockLevel: 18,
   },
   {
     productId: 6,
@@ -110,6 +115,7 @@ export const products: Product[] = [
     sku: 'CAT-GROOM-001',
     unit: 'piece',
     imgName: 'auto-groomer.png',
+    stockLevel: 30,
   },
   {
     productId: 7,
@@ -122,6 +128,7 @@ export const products: Product[] = [
     unit: 'piece',
     imgName: 'smart-fountain.png',
     discount: 0.25,
+    stockLevel: 3,
   },
   {
     productId: 8,
@@ -133,6 +140,7 @@ export const products: Product[] = [
     sku: 'CAT-SCRATCH-001',
     unit: 'piece',
     imgName: 'scratch-pad.png',
+    stockLevel: 15,
   },
   {
     productId: 9,
@@ -144,6 +152,7 @@ export const products: Product[] = [
     sku: 'CAT-CAM-001',
     unit: 'piece',
     imgName: 'chirp-cam.png',
+    stockLevel: 8,
   },
   {
     productId: 10,
@@ -156,6 +165,7 @@ export const products: Product[] = [
     unit: 'piece',
     imgName: 'snack-vault.png',
     discount: 0.25,
+    stockLevel: 22,
   },
   {
     productId: 11,
@@ -167,6 +177,7 @@ export const products: Product[] = [
     sku: 'CAT-DOOR-001',
     unit: 'piece',
     imgName: 'door-dash.png',
+    stockLevel: 12,
   },
   {
     productId: 12,
@@ -178,6 +189,7 @@ export const products: Product[] = [
     sku: 'CAT-TRACKER-001',
     unit: 'piece',
     imgName: 'tracker-mat.png',
+    stockLevel: 6,
   },
 ];
 
