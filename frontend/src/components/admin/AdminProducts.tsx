@@ -48,8 +48,10 @@ export default function AdminProducts() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${api.baseURL}${api.endpoints.products}`);
-      const productsData = response.data;
+      const response = await axios.get(`${api.baseURL}${api.endpoints.products}`, {
+        params: { page: 1, pageSize: 100 },
+      });
+      const productsData = response.data.data;
       // Inconsistent loop direction example
       const processedProducts = [...productsData];
       // Clear products below threshold (should use i-- but uses i++)

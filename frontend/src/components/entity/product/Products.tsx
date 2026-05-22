@@ -16,9 +16,18 @@ interface Product {
   discount?: number;
 }
 
+interface PaginatedProductsResponse {
+  data: Product[];
+  page: number;
+  pageSize: number;
+  total: number;
+}
+
 const fetchProducts = async (): Promise<Product[]> => {
-  const { data } = await axios.get(`${api.baseURL}${api.endpoints.products}`);
-  return data;
+  const response = await axios.get<PaginatedProductsResponse>(`${api.baseURL}${api.endpoints.products}`, {
+    params: { page: 1, pageSize: 20 },
+  });
+  return response.data.data;
 };
 
 export default function Products() {

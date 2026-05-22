@@ -9,17 +9,42 @@
  * @swagger
  * /api/products:
  *   get:
- *     summary: Returns all products
+ *     summary: Returns paginated products
  *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 20
+ *         description: Number of products per page
  *     responses:
  *       200:
- *         description: List of all products
+ *         description: Paginated product list
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Product'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *                 page:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ *                 total:
+ *                   type: integer
  *   post:
  *     summary: Create a new product
  *     tags: [Products]
@@ -120,9 +145,20 @@ router.post('/', async (req, res, next) => {
 // Get all products
 router.get('/', async (req, res, next) => {
   try {
+    const pageQuery = Number.parseInt(String(req.query.page ?? '1'), 10);
+    const page = Number.isFinite(pageQuery) && pageQuery > 0 ? pageQuery : 1;
+
+    const pageSizeQuery = Number.parseInt(String(req.query.pageSize ?? '20'), 10);
+    const validPageSize = Number.isFinite(pageSizeQuery) && pageSizeQuery > 0 ? pageSizeQuery : 20;
+    const pageSize = Math.min(validPageSize, 100);
+
     const repo = await getProductsRepository();
     const products = await repo.findAll();
-    res.json(products);
+    const total = products.length;
+    const offset = (page - 1) * pageSize;
+    const data = products.slice(offset, offset + pageSize);
+
+    res.json({ data, page, pageSize, total });
   } catch (error) {
     next(error);
   }
