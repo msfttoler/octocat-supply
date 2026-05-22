@@ -17,6 +17,8 @@ interface Product {
   discount?: number;
 }
 
+const LOW_STOCK_THRESHOLD = 10;
+
 const fetchProducts = async (): Promise<Product[]> => {
   const { data } = await axios.get(`${api.baseURL}${api.endpoints.products}`);
   return data;
@@ -158,7 +160,8 @@ export default function Products() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredProducts?.map((product) => {
               const hasDiscount = product.discount != null && product.discount > 0;
-              const isLowStock = typeof product.stockLevel === 'number' && product.stockLevel < 10;
+              const isLowStock =
+                typeof product.stockLevel === 'number' && product.stockLevel < LOW_STOCK_THRESHOLD;
               return (
                 <div
                   key={product.productId}
