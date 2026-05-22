@@ -157,7 +157,7 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-// Get all products
+// Get paginated products
 router.get('/', async (req, res, next) => {
   try {
     const { page, pageSize } = parsePaginationParams(req.query as Record<string, unknown>);
