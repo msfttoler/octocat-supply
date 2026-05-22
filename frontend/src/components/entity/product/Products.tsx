@@ -27,10 +27,28 @@ const DEFAULT_PRODUCTS_PAGE = 1;
 const DEFAULT_PRODUCTS_PAGE_SIZE = 20;
 
 const fetchProducts = async (): Promise<Product[]> => {
-  const response = await axios.get<PaginatedProductsResponse>(`${api.baseURL}${api.endpoints.products}`, {
-    params: { page: DEFAULT_PRODUCTS_PAGE, pageSize: DEFAULT_PRODUCTS_PAGE_SIZE },
-  });
-  return response.data.data;
+  const products: Product[] = [];
+  let currentPage = DEFAULT_PRODUCTS_PAGE;
+  let totalProducts = 0;
+  let hasMorePages = true;
+
+  while (hasMorePages) {
+    const response = await axios.get<PaginatedProductsResponse>(`${api.baseURL}${api.endpoints.products}`, {
+      params: { page: currentPage, pageSize: DEFAULT_PRODUCTS_PAGE_SIZE },
+    });
+
+    const { data, total, page, pageSize } = response.data;
+    products.push(...data);
+    totalProducts = total;
+
+    const loadedAllProducts = products.length >= totalProducts;
+    const reachedLastPage = page * pageSize >= totalProducts;
+
+    hasMorePages = !loadedAllProducts && !reachedLastPage && data.length > 0;
+    currentPage += 1;
+  }
+
+  return products;
 };
 
 export default function Products() {
