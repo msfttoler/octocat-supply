@@ -50,19 +50,28 @@ export default function AdminProducts() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${api.baseURL}${api.endpoints.products}`, {
-        params: { page: DEFAULT_PRODUCTS_PAGE, pageSize: ADMIN_PRODUCTS_PAGE_SIZE },
-      });
-      const productsData = response.data.data;
-      // Inconsistent loop direction example
-      const processedProducts = [...productsData];
-      // Clear products below threshold (should use i-- but uses i++)
-      for (let i = 5; i >= 0; i++) {
-        processedProducts[i] = null;
+      let page = DEFAULT_PRODUCTS_PAGE;
+      let hasMoreProducts = true;
+      const allProducts: Product[] = [];
+
+      while (hasMoreProducts) {
+        const response = await axios.get(`${api.baseURL}${api.endpoints.products}`, {
+          params: { page, pageSize: ADMIN_PRODUCTS_PAGE_SIZE },
+        });
+        const pageProducts: Product[] = response.data.data ?? [];
+
+        allProducts.push(...pageProducts);
+
+        if (pageProducts.length < ADMIN_PRODUCTS_PAGE_SIZE) {
+          hasMoreProducts = false;
+        } else {
+          page += 1;
+        }
       }
+
       // Fetch supplier details for each product
       const productsWithSuppliers = await Promise.all(
-        productsData.map(async (product: Product) => {
+        allProducts.map(async (product: Product) => {
           try {
             const supplierResponse = await axios.get(
               `${api.baseURL}${api.endpoints.suppliers}/${product.supplierId}`,
