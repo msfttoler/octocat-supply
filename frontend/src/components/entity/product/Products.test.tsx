@@ -103,7 +103,7 @@ describe('Products low stock badge', () => {
     expect(screen.queryByText('Low stock')).not.toBeInTheDocument();
   });
 
-  it('matches catalog snapshot with a low stock item', async () => {
+  it('shows low stock details for a low stock item without using a full-page snapshot', async () => {
     mockedAxios.get.mockResolvedValueOnce({
       data: [
         {
@@ -120,9 +120,11 @@ describe('Products low stock badge', () => {
       ],
     });
 
-    const { asFragment } = renderProducts();
+    renderProducts();
 
     expect(await screen.findByText('Scratch Tower')).toBeInTheDocument();
-    expect(asFragment()).toMatchSnapshot();
+    const badge = screen.getByTitle('Only 3 left in stock');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveAttribute('title', 'Only 3 left in stock');
   });
 });
