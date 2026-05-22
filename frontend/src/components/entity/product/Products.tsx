@@ -23,9 +23,12 @@ interface PaginatedProductsResponse {
   total: number;
 }
 
+const DEFAULT_PRODUCTS_PAGE = 1;
+const DEFAULT_PRODUCTS_PAGE_SIZE = 20;
+
 const fetchProducts = async (): Promise<Product[]> => {
   const response = await axios.get<PaginatedProductsResponse>(`${api.baseURL}${api.endpoints.products}`, {
-    params: { page: 1, pageSize: 20 },
+    params: { page: DEFAULT_PRODUCTS_PAGE, pageSize: DEFAULT_PRODUCTS_PAGE_SIZE },
   });
   return response.data.data;
 };

@@ -27,6 +27,33 @@ export class ProductsRepository {
   }
 
   /**
+   * Get a page of products
+   */
+  async findPaginated(offset: number, limit: number): Promise<Product[]> {
+    try {
+      const rows = await this.db.all<DatabaseRow>(
+        'SELECT * FROM products ORDER BY product_id LIMIT ? OFFSET ?',
+        [limit, offset],
+      );
+      return mapDatabaseRows<Product>(rows);
+    } catch (error) {
+      handleDatabaseError(error);
+    }
+  }
+
+  /**
+   * Get total products count
+   */
+  async count(): Promise<number> {
+    try {
+      const result = await this.db.get<{ count: number }>('SELECT COUNT(*) as count FROM products');
+      return result?.count || 0;
+    } catch (error) {
+      handleDatabaseError(error);
+    }
+  }
+
+  /**
    * Get product by ID
    */
   async findById(id: number): Promise<Product | null> {

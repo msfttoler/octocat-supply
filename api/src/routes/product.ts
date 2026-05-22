@@ -130,6 +130,21 @@ import { getProductsRepository } from '../repositories/productsRepo';
 import { NotFoundError } from '../utils/errors';
 
 const router = express.Router();
+const DEFAULT_PAGE = 1;
+const DEFAULT_PAGE_SIZE = 20;
+const MAX_PAGE_SIZE = 100;
+
+function parsePositiveInt(value: unknown, fallback: number): number {
+  const parsed = Number.parseInt(String(value ?? ''), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function parsePaginationParams(query: Record<string, unknown>): { page: number; pageSize: number } {
+  const page = parsePositiveInt(query.page, DEFAULT_PAGE);
+  const requestedPageSize = parsePositiveInt(query.pageSize, DEFAULT_PAGE_SIZE);
+  const pageSize = Math.min(requestedPageSize, MAX_PAGE_SIZE);
+  return { page, pageSize };
+}
 
 // Create a new product
 router.post('/', async (req, res, next) => {
@@ -145,18 +160,12 @@ router.post('/', async (req, res, next) => {
 // Get all products
 router.get('/', async (req, res, next) => {
   try {
-    const pageQuery = Number.parseInt(String(req.query.page ?? '1'), 10);
-    const page = Number.isFinite(pageQuery) && pageQuery > 0 ? pageQuery : 1;
-
-    const pageSizeQuery = Number.parseInt(String(req.query.pageSize ?? '20'), 10);
-    const validPageSize = Number.isFinite(pageSizeQuery) && pageSizeQuery > 0 ? pageSizeQuery : 20;
-    const pageSize = Math.min(validPageSize, 100);
+    const { page, pageSize } = parsePaginationParams(req.query as Record<string, unknown>);
 
     const repo = await getProductsRepository();
-    const products = await repo.findAll();
-    const total = products.length;
+    const total = await repo.count();
     const offset = (page - 1) * pageSize;
-    const data = products.slice(offset, offset + pageSize);
+    const data = await repo.findPaginated(offset, pageSize);
 
     res.json({ data, page, pageSize, total });
   } catch (error) {

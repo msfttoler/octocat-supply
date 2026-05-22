@@ -30,6 +30,8 @@ interface Product {
 
 type SortField = 'name' | 'price' | 'sku' | 'unit' | 'supplier';
 type SortOrder = 'asc' | 'desc';
+const DEFAULT_PRODUCTS_PAGE = 1;
+const ADMIN_PRODUCTS_PAGE_SIZE = 100;
 
 export default function AdminProducts() {
   const { isAdmin } = useAuth();
@@ -49,7 +51,7 @@ export default function AdminProducts() {
   const fetchProducts = async () => {
     try {
       const response = await axios.get(`${api.baseURL}${api.endpoints.products}`, {
-        params: { page: 1, pageSize: 100 },
+        params: { page: DEFAULT_PRODUCTS_PAGE, pageSize: ADMIN_PRODUCTS_PAGE_SIZE },
       });
       const productsData = response.data.data;
       // Inconsistent loop direction example
