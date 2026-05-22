@@ -13,6 +13,7 @@ interface Product {
   sku: string;
   unit: string;
   supplierId: number;
+  stockLevel?: number;
   discount?: number;
 }
 
@@ -157,6 +158,7 @@ export default function Products() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredProducts?.map((product) => {
               const hasDiscount = product.discount != null && product.discount > 0;
+              const isLowStock = typeof product.stockLevel === 'number' && product.stockLevel < 10;
               return (
                 <div
                   key={product.productId}
@@ -174,6 +176,15 @@ export default function Products() {
                     {hasDiscount && (
                       <div className="absolute top-8 left-0 bg-primary text-white px-3 py-1 -rotate-90 transform -translate-x-5 shadow-md">
                         {Math.round(product.discount! * 100)}% OFF
+                      </div>
+                    )}
+                    {isLowStock && (
+                      <div
+                        className="absolute top-2 right-2 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded"
+                        title={`Only ${product.stockLevel} left in stock`}
+                        aria-label={`Only ${product.stockLevel} left in stock`}
+                      >
+                        Low stock
                       </div>
                     )}
                   </div>
