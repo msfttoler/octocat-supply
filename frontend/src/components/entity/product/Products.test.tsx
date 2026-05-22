@@ -58,6 +58,51 @@ describe('Products low stock badge', () => {
     expect(badge).toHaveAttribute('title', 'Only 4 left in stock');
   });
 
+  it('does not show a low stock badge when stock is exactly 10', async () => {
+    mockedAxios.get.mockResolvedValueOnce({
+      data: [
+        {
+          productId: 3,
+          name: 'Cat Wand',
+          description: 'Interactive wand toy',
+          price: 9.99,
+          imgName: 'cat-wand.png',
+          sku: 'CAT-003',
+          unit: 'unit',
+          supplierId: 12,
+          stockLevel: 10,
+        },
+      ],
+    });
+
+    renderProducts();
+
+    expect(await screen.findByText('Cat Wand')).toBeInTheDocument();
+    expect(screen.queryByText('Low stock')).not.toBeInTheDocument();
+  });
+
+  it('does not show a low stock badge when stockLevel is undefined', async () => {
+    mockedAxios.get.mockResolvedValueOnce({
+      data: [
+        {
+          productId: 4,
+          name: 'Laser Pointer',
+          description: 'Fun laser toy',
+          price: 5.99,
+          imgName: 'laser.png',
+          sku: 'CAT-004',
+          unit: 'unit',
+          supplierId: 13,
+        },
+      ],
+    });
+
+    renderProducts();
+
+    expect(await screen.findByText('Laser Pointer')).toBeInTheDocument();
+    expect(screen.queryByText('Low stock')).not.toBeInTheDocument();
+  });
+
   it('matches catalog snapshot with a low stock item', async () => {
     mockedAxios.get.mockResolvedValueOnce({
       data: [
