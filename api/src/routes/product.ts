@@ -9,17 +9,42 @@
  * @swagger
  * /api/products:
  *   get:
- *     summary: Returns all products
+ *     summary: Returns paginated products
  *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 20
+ *         description: Number of products per page
  *     responses:
  *       200:
- *         description: List of all products
+ *         description: Paginated product list
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Product'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *                 page:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ *                 total:
+ *                   type: integer
  *   post:
  *     summary: Create a new product
  *     tags: [Products]
@@ -105,6 +130,21 @@ import { getProductsRepository } from '../repositories/productsRepo';
 import { NotFoundError } from '../utils/errors';
 
 const router = express.Router();
+const DEFAULT_PAGE = 1;
+const DEFAULT_PAGE_SIZE = 20;
+const MAX_PAGE_SIZE = 100;
+
+function parsePositiveInt(value: unknown, fallback: number): number {
+  const parsed = Number.parseInt(String(value ?? ''), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function parsePaginationParams(query: Record<string, unknown>): { page: number; pageSize: number } {
+  const page = parsePositiveInt(query.page, DEFAULT_PAGE);
+  const requestedPageSize = parsePositiveInt(query.pageSize, DEFAULT_PAGE_SIZE);
+  const pageSize = Math.min(requestedPageSize, MAX_PAGE_SIZE);
+  return { page, pageSize };
+}
 
 // Create a new product
 router.post('/', async (req, res, next) => {
@@ -117,12 +157,17 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-// Get all products
+// Get paginated products
 router.get('/', async (req, res, next) => {
   try {
+    const { page, pageSize } = parsePaginationParams(req.query as Record<string, unknown>);
+
     const repo = await getProductsRepository();
-    const products = await repo.findAll();
-    res.json(products);
+    const total = await repo.count();
+    const offset = (page - 1) * pageSize;
+    const data = await repo.findPaginated(offset, pageSize);
+
+    res.json({ data, page, pageSize, total });
   } catch (error) {
     next(error);
   }
