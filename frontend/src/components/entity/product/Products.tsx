@@ -3,12 +3,14 @@ import axios from 'axios';
 import { useQuery } from 'react-query';
 import { api } from '../../../api/config';
 import { useTheme } from '../../../context/ThemeContext';
+import LowStockBadge from './LowStockBadge';
 
 interface Product {
   productId: number;
   name: string;
   description: string;
   price: number;
+  stock?: number;
   imgName: string;
   sku: string;
   unit: string;
@@ -206,6 +208,7 @@ export default function Products() {
                         {Math.round(product.discount! * 100)}% OFF
                       </div>
                     )}
+                    <LowStockBadge stock={product.stock} />
                   </div>
 
                   <div className="p-4 flex flex-col flex-grow">
